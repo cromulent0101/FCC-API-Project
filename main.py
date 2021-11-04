@@ -12,4 +12,4 @@ def read_root():
 def get_posts():
     return {"item_id": "this is your posts"}
 
-print("committing from CLI worked, so trying from VSC")
+print("committing from CLI worked, so trying from VSC to origin/main")
