@@ -11,3 +11,5 @@ def read_root():
 @app.get("/posts")
 def get_posts():
     return {"item_id": "this is your posts"}
+
+    poop
