@@ -18,11 +18,18 @@ class Post(BaseModel):
 
 my_posts = [{"title":"title of post1", "content":"content of post 1","id":123},{"title":"fav foods","content":"pizza","id":232}]
 
-def find_posts(id):
+def find_post(id):
     for p in my_posts:
         print(p)
         if p['id'] == id:
             return p
+
+
+def find_index(id):
+    for p in my_posts:
+        print(p)
+        if p['id'] == id:
+            return my_posts.index(p)
 
 @app.get("/")
 def read_root():
@@ -42,7 +49,7 @@ def create_posts(post: Post):
 
 @app.get("/posts/{id}")
 def get_one_post(id: int,response: Response):
-    post = find_posts(id)
+    post = find_post(id)
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'post with id: {id} not found')
@@ -52,11 +59,21 @@ def get_one_post(id: int,response: Response):
 
 @app.delete("/posts/{id}",status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
-    post = find_posts(id)
+    post = find_post(id)
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'post with id: {id} not found')
-        # response.status_code = status.HTTP_404_NOT_FOUND
-        # return {'message':f'post with {id} not found'}
+
     my_posts.remove(post)
     return({"message": f"post {id} successfully rmemoved"})
+
+@app.put("/posts/{id}",status_code=status.HTTP_200_OK)
+def update_post(id: int,post: Post):
+    oldpost = find_post(id)
+    if not oldpost:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f'post with id: {id} not found')
+    post_dict = post.dict()
+    post_dict['id'] = id
+    my_posts[my_posts.index(oldpost)] = post_dict
+    return {"message": f"updated post {id}"}
