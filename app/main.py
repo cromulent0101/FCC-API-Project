@@ -7,6 +7,7 @@ from fastapi import FastAPI,Response,status,HTTPException
 from fastapi import Body
 from pydantic import BaseModel
 from random import randrange
+import psycopg
 
 app = FastAPI()
 
@@ -14,8 +15,15 @@ class Post(BaseModel):
     title: str
     content: str
     published: bool = True
-    rating: Optional[int] = None
 
+    try:
+        conn = psycopg.connect(host='localhost', database='fastapi', user='postgres', password='password123',cursor_factory=RealDictCursor)
+        cursor = conn.cursor()
+        print('yay')
+    except Exception as error:
+        print('nay')
+        print('error = ',error)
+        
 my_posts = [{"title":"title of post1", "content":"content of post 1","id":123},{"title":"fav foods","content":"pizza","id":232}]
 
 def find_post(id):
