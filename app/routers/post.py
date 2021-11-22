@@ -8,14 +8,14 @@ from sqlalchemy.orm import Session
 from .. import models,schemas,utils
 from ..database import engine,get_db
 
-models.Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine)    # create Post table if one does not exist? or update?
 
 router = APIRouter(
     prefix="/posts",
     tags=['Posts']
 )
 
-@router.get("/",response_model=List[schemas.Post])
+@router.get("/",response_model=List[schemas.Post])  # need List of Posts because we return multiple
 def get_posts(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all()
     return posts
