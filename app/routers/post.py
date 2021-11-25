@@ -22,15 +22,14 @@ def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.
 
 @router.post("/",status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
 def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    print(current_user)
-    new_post = models.Post(**post.dict())
+    new_post = models.Post(user_id=current_user.id, **post.dict())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
     return new_post
 
 @router.get("/{id}",response_model=schemas.Post)
-def get_one_post(id: int, response: Response, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+def get_post(id: int, response: Response, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     post = db.query(models.Post).filter(models.Post.id==id).first()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -43,7 +42,9 @@ def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depe
     if not post.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'post with id: {id} not found')
-
+    if post.first().user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+            detail="that's not your post")
     post.delete(synchronize_session=False)
     db.commit()
     return({"message": f"post {id} successfully rmemoved"})
