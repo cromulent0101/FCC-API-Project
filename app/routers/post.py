@@ -34,6 +34,9 @@ def get_post(id: int, response: Response, db: Session = Depends(get_db), current
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'post with id: {id} not found')
+    if post.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+            detail="that's not your post")
     return post
 
 @router.delete("/{id}",status_code=status.HTTP_204_NO_CONTENT)
