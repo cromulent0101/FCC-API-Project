@@ -56,6 +56,9 @@ def update_post(id: int,updated_post: schemas.PostBase, db: Session = Depends(ge
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'post with id: {id} not found')
+    if post.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+            detail="that's not your post")
     post_query.update(updated_post.dict(),synchronize_session=False)
     db.commit()
     return post_query.first()
