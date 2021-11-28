@@ -4,16 +4,7 @@ from sqlalchemy.orm import Session
 from . import models,schemas,utils
 from .database import engine
 from .routers import post,user,auth
-from pydantic import BaseSettings
-
-class Settings(BaseSettings):
-    database_pwd: str = "localhost"
-    database_username: str = "postgres"
-    sercet_key: str = "sakd;fjasd;kjasfdjasdfasdf"
-
-settings = Settings()
-
-print(settings.database_username)
+from .config import settings
 
 models.Base.metadata.create_all(bind=engine)
 
