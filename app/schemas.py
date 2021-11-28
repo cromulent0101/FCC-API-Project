@@ -1,5 +1,5 @@
 # pylint: skip-file
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, conint
 from datetime import datetime
 from typing import Optional
 
@@ -44,3 +44,9 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[int]
+
+class Vote(BaseModel):
+    post_id: int
+    direction: conint(le=1)
+    class Config:
+        orm_mode=True
