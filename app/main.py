@@ -1,12 +1,11 @@
 from fastapi import FastAPI,Response,status,HTTPException,Depends,APIRouter
-from fastapi import Body
 from sqlalchemy.orm import Session
 from . import models,schemas,utils
 from .database import engine
 from .routers import post,user,auth,vote
 from .config import settings
 
-models.Base.metadata.create_all(bind=engine)
+# models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
     
