@@ -3,8 +3,6 @@ from pydantic import BaseModel, EmailStr, conint
 from datetime import datetime
 from typing import Optional
 
-
-
 class UserCreate(BaseModel):
     email: EmailStr
     password: str

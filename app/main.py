@@ -9,7 +9,7 @@ from .config import settings
 
 # models.Base.metadata.create_all(bind=engine)
 
-origins = ["*"] # no header unless this is star?/?
+origins = ["*"] # no header unless this is star??? wtf
 
 ware = [Middleware(CORSMiddleware, 
         allow_origins=origins, 
@@ -27,5 +27,5 @@ app.include_router(vote.router)
 
 @app.get("/")
 def root():
-    return {"Hello": "test"}
+    return {"Hello!!!": "test"}
 
