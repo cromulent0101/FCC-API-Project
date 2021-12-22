@@ -2,16 +2,31 @@ version: "3"
 services: 
   api:
     build: .
+    depends_on: 
+      - postgres
     ports: 
       - 8000:8000
-    env_file:
-      - ./.env
-    # environment: 
-    #   - DATABASE_HOSTNAME=localhost
-    #   - DATABASE_PORT=5432
-    #   - DATABASE_PASSWORD=12345
-    #   - DATABASE_USERNAME=josephkaiser
-    #   - DATABASE_NAME=fastapi
-    #   - SECRET_KEY=FD0CCA14-D8A4-4B73-AE21-093C66D2D0AB
-    #   - ALGORITHM=HS256
-    #   - ACCESS_TOKEN_EXPIRE_MINUTES=60
+    # env_file:
+      # - ./.env
+    volumes: 
+      - ./:/usr/src/app:ro
+    environment: 
+      - DATABASE_HOSTNAME=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_PASSWORD=12345
+      - DATABASE_USERNAME=postgres # for some reason it didnt' like josephkaiser
+      - DATABASE_NAME=fastapi
+      - SECRET_KEY=FD0CCA14-D8A4-4B73-AE21-093C66D2D0AB
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+  postgres:
+    image: postgres
+    environment: 
+      - POSTGRES_PASSWORD=12345
+      - POSTGRES_DB=fastapi
+
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+volumes:
+  postgres-db: 
