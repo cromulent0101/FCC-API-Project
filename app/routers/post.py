@@ -17,10 +17,8 @@ router = APIRouter(
 )
 
 @router.get("/",response_model=List[schemas.PostOut])  # need List of Posts because we return multiple
-# @router.get("/")  
 def get_posts(db: Session = Depends(get_db), # , current_user: int = Depends(oauth2.get_current_user), 
     limit: int = 10, skip: int = 0, search: Optional[str] = ""):
-    # posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
         models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(
         models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
@@ -43,10 +41,6 @@ def get_post(id: int, response: Response, db: Session = Depends(get_db), current
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'post with id: {id} not found')
-    # print(post.user_id)
-    # if post.user_id != current_user.id:
-    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-    #         detail="that's not your post")
     return post
 
 @router.delete("/{id}",status_code=status.HTTP_204_NO_CONTENT)
