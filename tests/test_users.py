@@ -7,6 +7,7 @@ from app.database import get_db
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from alembic import command
 
 SQLALCHEMY_DATABASE_URL = 'postgresql://postgres:12345@localhost:5432/fastapi-test'
 
@@ -29,13 +30,23 @@ async def read_main():
 app.dependency_overrides[get_db] = override_get_db
 
 @pytest.fixture
-def client():
-    models.Base.metadata.create_all(bind=engine)
+def client(session):
     # run our code before we run our test
+    # command.upgrade("head",) # make sure you have the right test db env vars
     yield TestClient(app)
-    # run tihis code after our test finishes
-    models.Base.metadata.drop_all(bind=engine) # drop all tables to prevent duplicate users
+    # run this code after our test finishes
+    #command.downgrade("base")
  
+@pytest.fixture
+def session():
+    models.Base.metadata.drop_all(bind=engine) # drop all tables to prevent duplicate users
+    models.Base.metadata.create_all(bind=engine)
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:   
+        db.close() 
+
 def test_read_main(client):
     response = client.get("/")
     assert response.status_code == 200
@@ -43,7 +54,7 @@ def test_read_main(client):
 
 def test_create_user(client):
     res = client.post("/users/",json={"email": "ss@gmail.com", "password": "password123"})
-
+    
     new_user = schemas.UserOut(**res.json())
     assert new_user.email=="ss@gmail.com"
     assert res.status_code == 201
