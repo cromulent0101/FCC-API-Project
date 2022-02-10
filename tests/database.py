@@ -21,10 +21,12 @@ async def read_main():
     return {"msg": "Hello World"}
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def client(session):
     # run our code before we run our test
     # command.upgrade("head",) # make sure you have the right test db env vars
+    print("my session fixture ran")
+
     def override_get_db():
         try:
             yield session
@@ -35,8 +37,9 @@ def client(session):
     # run this code after our test finishes
     #command.downgrade("base")
  
-@pytest.fixture
+@pytest.fixture(scope="function")
 def session():
+    print("my session fixture ran")
     models.Base.metadata.drop_all(bind=engine) # drop all tables to prevent duplicate users
     models.Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
