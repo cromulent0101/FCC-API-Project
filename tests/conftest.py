@@ -5,6 +5,7 @@ import pytest
 from app.main import app
 from app.config import settings
 from app.database import get_db
+from app.oauth2 import create_access_token
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -26,6 +27,16 @@ def test_user(client):
     return new_user
 
 @pytest.fixture(scope="function")
+def session():
+    models.Base.metadata.drop_all(bind=engine) # drop all tables to prevent duplicate users
+    models.Base.metadata.create_all(bind=engine)
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:   
+        db.close() 
+
+@pytest.fixture(scope="function")
 def client(session):
     # run our code before we run our test
     # command.upgrade("head",) # make sure you have the right test db env vars
@@ -41,14 +52,16 @@ def client(session):
     # run this code after our test finishes
     #command.downgrade("base")
  
-@pytest.fixture(scope="function")
-def session():
-    print("my session fixture ran")
-    models.Base.metadata.drop_all(bind=engine) # drop all tables to prevent duplicate users
-    models.Base.metadata.create_all(bind=engine)
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:   
-        db.close() 
 
+@pytest.fixture(scope="function")
+def token(test_user):
+    return create_access_token({'user_id': test_user['id']})
+
+
+@pytest.fixture(scope="function")
+def authorized_client(client,token):
+    client.headers = {
+        **client.headers,
+        "Authorization": f"Bearer {token}"
+    }
+    return client
