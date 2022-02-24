@@ -1,5 +1,17 @@
-def test_get_all_posts(authorized_client):
-    res = authorized_client.get('/posts')
+from typing import List
+from app import schemas
 
-    print(res.json())
+
+
+def test_get_all_posts(authorized_client, test_posts):
+    res = authorized_client.get('/posts')
+    def validate(post):
+        return schemas.PostOut(**post)
+
+    posts_map = map(validate,res.json())
+    posts_list = list(posts_map)
+    # posts = schemas.PostOut()
+    breakpoint()
+    assert len(res.json())==len(test_posts)
     assert res.status_code == 200
+    # assert posts_list[0].Post.id == test_posts[0].id
