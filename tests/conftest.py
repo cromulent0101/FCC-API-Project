@@ -40,7 +40,7 @@ def session():
 def client(session):
     # run our code before we run our test
     # command.upgrade("head",) # make sure you have the right test db env vars
-    print("my session fixture ran")
+    # print("my session fixture ran")
 
     def override_get_db():
         try:
