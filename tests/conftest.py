@@ -27,6 +27,15 @@ def test_user(client):
     return new_user
 
 @pytest.fixture(scope="function")
+def test_user2(client):
+    user_data = {"email": "balls@gmail.com", "password": "321321"}
+    res = client.post("/users/",json=user_data)
+    assert res.status_code == 201
+    new_user2 = res.json()
+    new_user2['password']=user_data['password'] # add pwd to response
+    return new_user2
+
+@pytest.fixture(scope="function")
 def session():
     models.Base.metadata.drop_all(bind=engine) # drop all tables to prevent duplicate users
     models.Base.metadata.create_all(bind=engine)
@@ -67,7 +76,7 @@ def authorized_client(client,token):
     return client
 
 @pytest.fixture
-def test_posts(test_user, session):
+def test_posts(test_user, test_user2, session):
     posts_data = [{
         'title': 'first title',
         'content': 'first content',
@@ -80,6 +89,10 @@ def test_posts(test_user, session):
         'title': 'third title',
         'content': 'third content',
         'owner_id': test_user['id']
+    }, {
+        'title': 'fourth title',
+        'content': 'fourth content',
+        'owner_id': test_user2['id']
     }]
 
     def create_post_model(post):
