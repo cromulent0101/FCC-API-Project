@@ -45,8 +45,7 @@ def test_get_one_post(authorized_client, test_posts):
     ('ss@gmail.com','asdf',True)])
 def test_create_post(authorized_client, test_user, test_posts, title, content, published):
     res = authorized_client.post("/posts/", json={"title": title, "content": content,
-                                                "published": published})
-                                        
+                                                "published": published})           
     created_post = schemas.Post(**res.json())
     test_user = schemas.UserOut(**test_user)
     assert res.status_code == 201
@@ -61,3 +60,20 @@ def test_create_post_default_published(authorized_client,test_user):
 def test_unauthorized_user_create_post(client, test_posts): 
     res = client.post("/posts/", json={"title": "my title", "content": "my content"})
     assert res.status_code == 401 # only getting one post requires auth
+
+
+def test_unauthorized_delete_post(client,test_user,test_posts):
+    res = client.delete(f"/posts/{test_posts[0].id}")
+    assert res.status_code == 401
+
+def test_delete_post(authorized_client,test_user,test_posts):
+    res = authorized_client.delete(f"/posts/{test_posts[0].id}")
+    assert res.status_code == 204
+
+def test_delete_post_not_exist(authorized_client,test_user,test_posts):
+    res = authorized_client.delete("/posts/123123123")
+    assert res.status_code == 404
+
+def test_delete_other_user_post(authorized_client,test_user,test_posts):
+    res = authorized_client.delete(f"/posts/{test_posts[3].id}")
+    assert res.status_code == 403
