@@ -1,12 +1,6 @@
 name: Build and Deploy code
 
-on:
-  push:
-    branches:
-      - "main"
-      - "anotherbranch"
-  pull_request:
-    branches: ["main"]
+on: [push, pull_request]
 
 jobs:
   job1:
@@ -14,5 +8,11 @@ jobs:
     steps:
       - name: pulling git repo
         uses: actions/checkout@v2
-      - name: say hi to joe
-        uses: echo "hello joe"
+      - name: Install python version 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-verison: "3.9"
+      - name: update pip
+        run: python -m pip install --upgrade pip
+      - name: install all dependencies
+        run: pip install -r requirements.txt
